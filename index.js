@@ -2,7 +2,11 @@ var express = require('express'); //import de la bibliothèque Express
 var app = express(); //instanciation d'une application Express
 
 var compteur = 0;
-var allMsgs = ["Hello World", "foobar", "CentraleSupelec Forever"];
+var allMsgs = [
+  { text: "Hello World", pseudo: "Berlin", date: "2025-09-28T10:00:00.000Z" },
+  { text: "foobar", pseudo: "Dautrac", date: "2025-07-28T10:00:00.000Z" },
+  { text: "CentraleSupelec Forever", pseudo: "Loupiotte", date: "2025-05-29T10:00:00.000Z" }
+];
 
 // Pour s'assurer que l'on peut faire des appels AJAX au serveur
 app.use(function(req, res, next) {
@@ -65,7 +69,18 @@ app.get("/msg/get/*", function(req, res) {
 app.get("/msg/post/*", function(req, res) {
   var encodedMsg = req.params[0] || "";
   var decodedMsg = unescape(encodedMsg);
-  allMsgs.push(decodedMsg);
+  var pseudo = req.query.pseudo || "Anon";
+  var decodedPseudo = unescape(String(pseudo)).trim();
+
+  if (decodedPseudo.length === 0) {
+    decodedPseudo = "Anon";
+  }
+
+  allMsgs.push({
+    text: decodedMsg,
+    pseudo: decodedPseudo,
+    date: new Date().toISOString()
+  });
   res.json(allMsgs.length - 1);
 });
 
